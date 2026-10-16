@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.golf.erp.dashboard.DashboardMapper">
+	<select id="selectSummary"
+		resultType="com.golf.erp.dashboard.DashboardSummary">
+		SELECT (SELECT COUNT(*) FROM reservations WHERE reserved_at &gt;=
+		CURDATE() AND reserved_at &lt; DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND
+		status &lt;&gt; 'CANCELLED') AS todayReservations,
+		(SELECT COUNT(*) FROM members WHERE status='ACTIVE') AS
+		registeredMembers,
+		(SELECT COUNT(*) FROM golf_courses WHERE status='OPEN') AS
+		operatingCourses,
+		(SELECT COUNT(*) FROM reservations WHERE status='PENDING') AS
+		pendingReservations
+	</select>
+	<select id="selectRecentReservations"
+		resultType="com.golf.erp.dashboard.RecentReservation">
+		SELECT r.reservation_no AS reservationNo,m.name AS memberName,c.name AS
+		courseName,r.reserved_at AS reservedAt,r.status AS status
+		FROM reservations r JOIN members m ON m.id=r.member_id JOIN golf_courses
+		c ON c.id=r.course_id
+		ORDER BY r.created_at DESC LIMIT #{limit}
+	</select>
+</mapper>
