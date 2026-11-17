@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-GolfErpApplication<golf-be-erp>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.golf.erp.GolfErpApplication",
+            "projectName": "golf-be-erp",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
