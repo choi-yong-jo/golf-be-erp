@@ -3,45 +3,74 @@ package com.golf.erp.member;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/** golf.member. login_id/password_hash 는 예약 앱(회원 가입)이 관리하므로 ERP에서는 쓰지 않는다. */
 @Entity
-@Table(name = "members")
+@Table(name = "member")
 public class Member {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	@Column(name = "member_no", nullable = false, unique = true, length = 30)
+	@Column(name = "member_id")
+	private Long memberId;
+	@Column(name = "member_no", length = 30)
 	private String memberNo;
-	@Column(nullable = false, length = 80)
-	private String name;
+	@Column(name = "login_id", length = 100, insertable = false, updatable = false)
+	private String loginId;
+	@Column(name = "member_name", nullable = false, length = 100)
+	private String memberName;
 	@Column(length = 30)
 	private String phone;
-	@Column(length = 120)
+	@Column(length = 255)
 	private String email;
-	@Column(nullable = false, length = 20)
-	private String status = "ACTIVE";
-	@Column(name = "created_at", insertable = false, updatable = false)
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 10)
+	private MemberRole role = MemberRole.USER;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "member_status", nullable = false, length = 20)
+	private MemberStatus memberStatus = MemberStatus.ACTIVE;
+	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
+	@Column(name = "updated_at", nullable = false)
+	private LocalDateTime updatedAt;
 
 	protected Member() {
 	}
 
-	public Member(String memberNo, String name, String phone, String email) {
+	public Member(String memberNo, String memberName, String phone, String email, LocalDateTime now) {
 		this.memberNo = memberNo;
-		this.name = name;
+		this.memberName = memberName;
 		this.phone = phone;
 		this.email = email;
+		this.createdAt = now;
+		this.updatedAt = now;
 	}
 
-	public Long getId() {
-		return id;
+	public void update(String memberNo, String memberName, String phone, String email, LocalDateTime now) {
+		this.memberNo = memberNo;
+		this.memberName = memberName;
+		this.phone = phone;
+		this.email = email;
+		this.updatedAt = now;
+	}
+
+	public void changeStatus(MemberStatus status, LocalDateTime now) {
+		this.memberStatus = status;
+		this.updatedAt = now;
+	}
+
+	public Long getMemberId() {
+		return memberId;
 	}
 
 	public String getMemberNo() {
 		return memberNo;
 	}
 
-	public String getName() {
-		return name;
+	public String getLoginId() {
+		return loginId;
+	}
+
+	public String getMemberName() {
+		return memberName;
 	}
 
 	public String getPhone() {
@@ -52,18 +81,19 @@ public class Member {
 		return email;
 	}
 
-	public String getStatus() {
-		return status;
+	public MemberRole getRole() {
+		return role;
+	}
+
+	public MemberStatus getMemberStatus() {
+		return memberStatus;
 	}
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public void update(String name, String phone, String email, String status) {
-		this.name = name;
-		this.phone = phone;
-		this.email = email;
-		this.status = status;
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
 	}
 }

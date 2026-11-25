@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.golf.erp.payment.PaymentMapper">
+
+	<sql id="from">
+		  FROM golf.payment p
+		  JOIN golf.reservation r ON r.reservation_id = p.reservation_id
+		  JOIN golf.member m ON m.member_id = r.member_id
+		<where>
+			<if test="status != null and status != ''">AND p.payment_status = #{status}</if>
+			<if test="from != null">AND p.requested_at &gt;= #{from}</if>
+			<if test="to != null">AND p.requested_at &lt; #{to}</if>
+		</where>
+	</sql>
+
+	<select id="search" resultType="com.golf.erp.payment.dto.PaymentRow">
+		SELECT p.payment_id, p.reservation_id, r.reservation_no, m.member_name, p.payment_type, p.payment_status,
+		       p.payment_method, p.pg_provider, p.amount, p.requested_at, p.completed_at, p.refunded_at,
+		       p.failure_reason
+		<include refid="from" />
+		 ORDER BY p.requested_at DESC, p.payment_id DESC
+		 LIMIT #{size} OFFSET #{offset}
+	</select>
+
+	<select id="count" resultType="long">
+		SELECT COUNT(*)
+		<include refid="from" />
+	</select>
+</mapper>

@@ -1,17 +1,17 @@
 server:
-  port: 8081
+  port: 8040
+
 spring:
   application:
     name: golf-be-erp
   profiles:
-    default: local
-  jpa:
-    hibernate:
-      ddl-auto: validate
+    default: dev
     open-in-view: false
     properties:
       hibernate:
         format_sql: true
+        # 모든 테이블은 golf 스키마 (MyBatis SQL 은 golf. 을 직접 붙인다)
+        default_schema: golf
   sql:
     init:
       mode: never

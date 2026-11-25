@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.golf.erp.dashboard.DashboardMapper">
-	<select id="selectSummary"
-		resultType="com.golf.erp.dashboard.DashboardSummary">
-		SELECT (SELECT COUNT(*) FROM reservations WHERE reserved_at &gt;=
-		CURDATE() AND reserved_at &lt; DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND
-		status &lt;&gt; 'CANCELLED') AS todayReservations,
-		(SELECT COUNT(*) FROM members WHERE status='ACTIVE') AS
-		registeredMembers,
-		(SELECT COUNT(*) FROM golf_courses WHERE status='OPEN') AS
-		operatingCourses,
-		(SELECT COUNT(*) FROM reservations WHERE status='PENDING') AS
-		pendingReservations
+
+	<!-- 오늘 날짜는 Asia/Seoul 기준으로 애플리케이션이 넘긴다 (DB 세션 시간대와 무관) -->
+	<select id="selectSummary" resultType="com.golf.erp.dashboard.DashboardSummary">
+		SELECT
+		  (SELECT COUNT(*) FROM golf.reservation
+		    WHERE play_at &gt;= CAST(#{today} AS date) AND play_at &lt; CAST(#{today} AS date) + 1
+		      AND reservation_status NOT IN ('CANCELLED', 'FAILED')) AS today_reservations,
+		  (SELECT COUNT(*) FROM golf.member WHERE member_status = 'ACTIVE') AS registered_members,
+		  (SELECT COUNT(*) FROM golf.golf_course WHERE course_status = 'OPEN' AND is_active) AS operating_courses,
+		  (SELECT COUNT(*) FROM golf.reservation
+		    WHERE reservation_status IN ('PENDING', 'PENDING_PAYMENT', 'PAYING')) AS pending_reservations,
+		  (SELECT COUNT(*) FROM golf.tee_time WHERE play_date = #{today}) AS today_tee_times,
+		  (SELECT COUNT(*) FROM golf.tee_time
+		    WHERE play_date = #{today} AND tee_time_status = 'OPEN') AS today_open_tee_times,
+		  (SELECT COALESCE(SUM(amount), 0) FROM golf.payment
+		    WHERE payment_type = 'PAYMENT' AND payment_status IN ('PAID', 'SUCCEEDED', 'REFUNDED')
+		      AND completed_at &gt;= CAST(#{today} AS date) AND completed_at &lt; CAST(#{today} AS date) + 1) AS today_paid_amount
 	</select>
-	<select id="selectRecentReservations"
-		resultType="com.golf.erp.dashboard.RecentReservation">
-		SELECT r.reservation_no AS reservationNo,m.name AS memberName,c.name AS
-		courseName,r.reserved_at AS reservedAt,r.status AS status
-		FROM reservations r JOIN members m ON m.id=r.member_id JOIN golf_courses
-		c ON c.id=r.course_id
-		ORDER BY r.created_at DESC LIMIT #{limit}
+
+	<select id="selectRecentReservations" resultType="com.golf.erp.dashboard.RecentReservation">
+		SELECT r.reservation_id, r.reservation_no, m.member_name, gc.course_name,
+		       COALESCE(r.play_at, t.play_date + t.start_time) AS play_at, r.reservation_status, r.reserved_at
+		  FROM golf.reservation r
+		  JOIN golf.member m ON m.member_id = r.member_id
+		  LEFT JOIN golf.tee_time t ON t.tee_time_id = r.tee_time_id
+		  LEFT JOIN golf.golf_course gc ON gc.golf_course_id = COALESCE(r.golf_course_id, t.golf_course_id)
+		 ORDER BY r.created_at DESC, r.reservation_id DESC
+		 LIMIT #{limit}
 	</select>
 </mapper>
