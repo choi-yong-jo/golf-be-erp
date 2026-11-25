@@ -4,11 +4,14 @@ spring:
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:hubilon1!}
     driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always                                # dev에서만 schema.sql 실행
+      schema-locations: classpath:db/schema.sql   # 루트에 있으면 file:db/schema.sql
+      continue-on-error: false
   jpa:
-    properties:
-      hibernate:
-        jdbc:
-          time_zone: Asia/Seoul
+    hibernate:
+      ddl-auto: validate
 logging:
   level:
     com.golf.erp: info
