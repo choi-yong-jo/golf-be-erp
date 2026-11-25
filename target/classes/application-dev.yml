@@ -2,7 +2,7 @@ spring:
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/golf?sslmode=prefer}
     username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:hubilon1!}
+    password: ${DB_PASSWORD:cyjo1207}
     driver-class-name: org.postgresql.Driver
   sql:
     init:
