@@ -15,6 +15,7 @@ import com.golf.erp.payment.Payment;
 import com.golf.erp.payment.PaymentRepository;
 import com.golf.erp.payment.PaymentStatus;
 import com.golf.erp.payment.PaymentType;
+import com.golf.erp.redis.TeeTimeChangeNotifier;
 import com.golf.erp.reservation.dto.ReservationCreateRequest;
 import com.golf.erp.teetime.TeeTime;
 import com.golf.erp.teetime.TeeTimeRepository;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -52,12 +54,15 @@ public class ReservationCommandService {
 	private final GolfCourseService courseService;
 	private final GreenFeePolicyService feeService;
 	private final PaymentRepository paymentRepo;
+	private final TeeTimeChangeNotifier notifier;
 	private final Clock clock;
 
 	public ReservationCommandService(ReservationRepository repo, ReservationPlayerRepository playerRepo,
 			ReservationHistoryRepository historyRepo, TeeTimeRepository teeTimeRepo, MemberRepository memberRepo,
 			ReservationRestrictionService restrictionService, GolfCourseService courseService,
-			GreenFeePolicyService feeService, PaymentRepository paymentRepo, Clock clock) {
+			GreenFeePolicyService feeService, PaymentRepository paymentRepo, TeeTimeChangeNotifier notifier,
+			Clock clock) {
+		this.notifier = notifier;
 		this.repo = repo;
 		this.playerRepo = playerRepo;
 		this.historyRepo = historyRepo;
@@ -134,6 +139,8 @@ public class ReservationCommandService {
 					blankToNull(p.phone()), p.memberId(), false));
 
 		historyRepo.save(ReservationHistory.of("CREATE", reservation, null, null, null, null, now));
+		notifier.teeTimeChanged("RESERVATION_CREATED", courseId, tee.getPlayDate(), tee.getTeeTimeId(),
+				reservation.getReservationId(), reservation.getReservationStatus().name());
 		return reservation;
 	}
 
@@ -146,6 +153,7 @@ public class ReservationCommandService {
 		ReservationStatus before = r.getReservationStatus();
 		r.confirm(now);
 		history("CONFIRM", r, before, null, now);
+		notifyUpdated(r);
 		return r;
 	}
 
@@ -165,6 +173,7 @@ public class ReservationCommandService {
 		if (before == ReservationStatus.PENDING)
 			r.confirm(now);
 		history("PAYMENT", r, before, paymentMethod + " " + r.getTotalAmount().toPlainString(), now);
+		notifyUpdated(r);
 		return payment;
 	}
 
@@ -189,9 +198,12 @@ public class ReservationCommandService {
 
 		String cancelReason = reason == null || reason.isBlank() ? DEFAULT_CANCEL_REASON : reason.trim();
 		r.cancel(cancelReason, now);
-		if (r.getTeeTimeId() != null)
-			teeTimeRepo.findByIdForUpdate(r.getTeeTimeId()).ifPresent(TeeTime::release);
+		TeeTime tee = r.getTeeTimeId() == null ? null : teeTimeRepo.findByIdForUpdate(r.getTeeTimeId()).orElse(null);
+		if (tee != null)
+			tee.release();
 		history("CANCEL", r, before, cancelReason, now);
+		notifier.teeTimeChanged("RESERVATION_CANCELLED", courseIdOf(r, tee), playDateOf(r, tee), r.getTeeTimeId(),
+				r.getReservationId(), r.getReservationStatus().name());
 		return r;
 	}
 
@@ -223,7 +235,25 @@ public class ReservationCommandService {
 			throw new ConflictException("플레이 시작 시각 이후에 처리할 수 있습니다.");
 		r.finish(target, now);
 		history(action, r, before, null, now);
+		notifyUpdated(r);
 		return r;
+	}
+
+	/** 티타임 상태는 그대로인 예약 변경 알림 (예약 현황 화면 갱신용) */
+	private void notifyUpdated(Reservation r) {
+		TeeTime tee = r.getTeeTimeId() == null ? null : teeTimeRepo.findById(r.getTeeTimeId()).orElse(null);
+		LocalDate playDate = playDateOf(r, tee);
+		if (playDate != null)
+			notifier.reservationUpdated(courseIdOf(r, tee), playDate, r.getTeeTimeId(), r.getReservationId(),
+					r.getReservationStatus().name());
+	}
+
+	private static Long courseIdOf(Reservation r, TeeTime tee) {
+		return r.getGolfCourseId() != null ? r.getGolfCourseId() : tee == null ? null : tee.getGolfCourseId();
+	}
+
+	private static LocalDate playDateOf(Reservation r, TeeTime tee) {
+		return r.getPlayAt() != null ? r.getPlayAt().toLocalDate() : tee == null ? null : tee.getPlayDate();
 	}
 
 	private Reservation lock(long id) {

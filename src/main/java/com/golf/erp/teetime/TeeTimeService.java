@@ -7,6 +7,7 @@ import com.golf.erp.course.GolfCourseClosure;
 import com.golf.erp.course.GolfCourseService;
 import com.golf.erp.fee.GreenFeePolicy;
 import com.golf.erp.fee.GreenFeePolicyService;
+import com.golf.erp.redis.TeeTimeChangeNotifier;
 import com.golf.erp.reservation.ReservationRepository;
 import com.golf.erp.teetime.dto.*;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -33,14 +36,16 @@ public class TeeTimeService {
 	private final GolfCourseService courseService;
 	private final GreenFeePolicyService feeService;
 	private final ReservationRepository reservationRepo;
+	private final TeeTimeChangeNotifier notifier;
 
 	public TeeTimeService(TeeTimeRepository repo, TeeTimeMapper mapper, GolfCourseService courseService,
-			GreenFeePolicyService feeService, ReservationRepository reservationRepo) {
+			GreenFeePolicyService feeService, ReservationRepository reservationRepo, TeeTimeChangeNotifier notifier) {
 		this.repo = repo;
 		this.mapper = mapper;
 		this.courseService = courseService;
 		this.feeService = feeService;
 		this.reservationRepo = reservationRepo;
+		this.notifier = notifier;
 	}
 
 	@Transactional(readOnly = true)
@@ -66,9 +71,11 @@ public class TeeTimeService {
 		if (!courseService.activeClosures(course.getGolfCourseId(), at, at.plusMinutes(1)).isEmpty())
 			throw new ConflictException("휴장 기간에는 티타임을 만들 수 없습니다.");
 		BigDecimal fee = r.greenFee() != null ? r.greenFee() : policyFee(course.getGolfCourseId(), at);
-		return repo.saveAndFlush(new TeeTime(course.getGolfCourseId(), blankToNull(r.course()), r.playDate(),
+		TeeTime t = repo.saveAndFlush(new TeeTime(course.getGolfCourseId(), blankToNull(r.course()), r.playDate(),
 				r.startTime(), r.holeType() == null ? DEFAULT_HOLE_TYPE : r.holeType(),
 				r.capacity() == null ? DEFAULT_CAPACITY : r.capacity(), fee));
+		notifyChange("TEE_TIME_CREATED", t);
+		return t;
 	}
 
 	public TeeTimeGenerateResult generate(TeeTimeGenerateRequest r) {
@@ -108,6 +115,8 @@ public class TeeTimeService {
 		int created = 0;
 		for (int i = 0; i < rows.size(); i += INSERT_CHUNK)
 			created += mapper.insertIgnoreDuplicates(rows.subList(i, Math.min(i + INSERT_CHUNK, rows.size())));
+		if (created > 0)
+			notifier.teeTimesGenerated(courseId, rows.stream().map(TeeTime::getPlayDate).collect(Collectors.toCollection(TreeSet::new)));
 		int requested = rows.size() + skippedClosure;
 		return new TeeTimeGenerateResult(requested, created, rows.size() - created, skippedClosure, withoutFee);
 	}
@@ -131,6 +140,7 @@ public class TeeTimeService {
 			t.changeGreenFee(r.greenFee());
 		if (r.holeType() != null)
 			t.changeHoleType(r.holeType());
+		notifyChange("TEE_TIME_UPDATED", t);
 		return t;
 	}
 
@@ -140,6 +150,13 @@ public class TeeTimeService {
 		if (t.getTeeTimeStatus() == TeeTimeStatus.BOOKED || reservationRepo.existsByTeeTimeId(id))
 			throw new ConflictException("예약 이력이 있는 티타임은 삭제할 수 없습니다. CLOSED 로 변경하세요.");
 		repo.delete(t);
+		notifyChange("TEE_TIME_DELETED", t);
+	}
+
+	/** 커밋 후 예약 앱 티타임 캐시 삭제 + 예약 현황 실시간 알림 */
+	private void notifyChange(String type, TeeTime t) {
+		notifier.teeTimeChanged(type, t.getGolfCourseId(), t.getPlayDate(), t.getTeeTimeId(), null,
+				t.getTeeTimeStatus().name());
 	}
 
 	private BigDecimal policyFee(long courseId, LocalDateTime at) {

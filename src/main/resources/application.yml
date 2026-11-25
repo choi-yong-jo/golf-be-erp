@@ -1,11 +1,12 @@
 server:
-  port: 8040
+  port: 8081
 
 spring:
   application:
     name: golf-be-erp
   profiles:
     default: dev
+  jpa:
     open-in-view: false
     properties:
       hibernate:
@@ -15,6 +16,37 @@ spring:
   sql:
     init:
       mode: never
+  data:
+    redis:
+      # 예약 앱(golf-reservation-api)과 같은 Redis 를 써야 캐시 무효화가 효과가 있다
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6380}
+      password: ${REDIS_PASSWORD:}
+      # Redis 가 느리거나 죽어도 빨리 포기한다 (ERP 업무는 Redis 없이도 진행)
+      timeout: 1s
+      connect-timeout: 1s
+      repositories:
+        enabled: false
+
+# Redis 가 죽어도 /actuator/health 가 DOWN 이 되지 않게 한다 (Redis 는 부가 기능)
+management:
+  health:
+    redis:
+      enabled: false
+
+golf:
+  redis:
+    # false 면 Redis 를 전혀 쓰지 않는다 (실시간 알림은 이 서버 안에서만 전달)
+    enabled: ${REDIS_ENABLED:true}
+    # 예약 앱의 app.redis.key-prefix 와 같아야 한다
+    app-key-prefix: ${RESERVATION_APP_REDIS_KEY_PREFIX:golf-api:}
+    # 티타임/예약 변경 알림 채널 (ERP 와 예약 앱이 함께 쓰는 약속)
+    event-channel: golf:tee-time-events
+    # 예약 앱 access token 유효시간 (회원 정지 시 토큰 무효화 키 보관 시간 = 이 값 + 1분)
+    access-token-ttl: PT2H
+    # 회원을 정지/탈퇴시키면 예약 앱에서 즉시 로그아웃시킨다
+    revoke-tokens-on-suspend: true
+
 mybatis:
   mapper-locations: classpath:/mapper/*.xml
   configuration:

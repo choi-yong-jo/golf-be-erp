@@ -7,7 +7,7 @@ spring:
   sql:
     init:
       mode: always                                # dev에서만 schema.sql 실행
-      schema-locations: classpath:schema.sql      # src/main/resources/schema.sql
+      schema-locations: classpath:db/schema.sql   # src/main/resources/db/schema.sql
       continue-on-error: false
   jpa:
     hibernate:

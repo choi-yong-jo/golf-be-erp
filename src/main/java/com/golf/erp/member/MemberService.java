@@ -4,6 +4,7 @@ import com.golf.erp.common.ConflictException;
 import com.golf.erp.common.NotFoundException;
 import com.golf.erp.common.PageResult;
 import com.golf.erp.member.dto.MemberRequest;
+import com.golf.erp.redis.ReservationAppCacheSync;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -19,10 +20,12 @@ import java.util.Locale;
 @Transactional
 public class MemberService {
 	private final MemberRepository repo;
+	private final ReservationAppCacheSync cacheSync;
 	private final Clock clock;
 
-	public MemberService(MemberRepository repo, Clock clock) {
+	public MemberService(MemberRepository repo, ReservationAppCacheSync cacheSync, Clock clock) {
 		this.repo = repo;
+		this.cacheSync = cacheSync;
 		this.clock = clock;
 	}
 
@@ -74,6 +77,8 @@ public class MemberService {
 	public Member changeStatus(long id, MemberStatus status) {
 		Member m = get(id);
 		m.changeStatus(status, now());
+		// 커밋 후 예약 앱의 회원 상태 캐시 삭제, 정지/탈퇴면 예약 앱 토큰도 무효화 (Redis 실패해도 무시)
+		cacheSync.memberStatusChanged(id, status);
 		return m;
 	}
 

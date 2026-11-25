@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import java.time.Instant;
 import java.util.Map;
 
@@ -39,6 +40,11 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(NoResourceFoundException.class)
 	ResponseEntity<?> noResource(NoResourceFoundException e) {
 		return body(HttpStatus.NOT_FOUND, "요청한 경로를 찾을 수 없습니다: /" + e.getResourcePath());
+	}
+
+	/** SSE 등 응답 중에 클라이언트가 연결을 끊은 경우. 응답을 쓸 수 없으므로 무시한다. */
+	@ExceptionHandler(AsyncRequestNotUsableException.class)
+	void clientGone() {
 	}
 
 	@ExceptionHandler(NotFoundException.class)
