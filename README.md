@@ -40,7 +40,7 @@ Vue.js frontend(`golf-fe-erp`)와 연동하는 골프장 관리자(ERP) REST API
 | 코스 | `GET/POST /api/courses`, `GET/PUT /api/courses/{id}`, `PATCH /api/courses/{id}/status` |
 | 휴장 | `GET/POST /api/courses/{id}/closures`, `DELETE /api/courses/{id}/closures/{closureId}` (해제) |
 | 요금 | `GET/POST /api/fee-policies`, `GET/PUT/DELETE /api/fee-policies/{id}` (DELETE=비활성), `GET /api/fee-policies/quote?courseId=&date=&time=` |
-| 예약 현황(티타임) | `GET /api/tee-times?courseId=&from=&to=&status=`, `GET /api/tee-times/stream?courseId=` (SSE), `POST /api/tee-times`, `POST /api/tee-times/generate`, `GET/PATCH/DELETE /api/tee-times/{id}` |
+| 예약 현황(티타임) | `GET /api/tee-times?courseId=&from=&to=&status=`, `POST /api/tee-times`, `POST /api/tee-times/generate`, `GET/PATCH/DELETE /api/tee-times/{id}` |
 | 예약 | `GET /api/reservations?keyword=&status=&courseId=&memberId=&from=&to=`, `POST /api/reservations`, `GET /api/reservations/{id}` |
 | 예약 처리 | `POST /api/reservations/{id}/confirm`, `/payments`, `/cancel`, `/complete`, `/no-show`, `PATCH /api/reservations/{id}/memo` |
 | 결제 내역 | `GET /api/payments?status=&from=&to=` |
@@ -81,34 +81,6 @@ Vue.js frontend(`golf-fe-erp`)와 연동하는 골프장 관리자(ERP) REST API
 - 여러 정책이 맞으면: 특정 코스 > 공통, 요일 지정 > 미지정, 평일/주말 지정 > 미지정, 시간대 지정 > 미지정, 최근 시작일 > 최근 등록 순.
 - `HOLIDAY` 는 공휴일 달력이 없어 자동 적용되지 않는다.
 - 티타임 생성 시 그린피를 생략하면 정책의 `기본 요금 - 할인` 으로 채운다. 정책도 없으면 비워 두며, 이 티타임은 예약 앱에 노출되지 않는다.
-
-### Redis (예약 앱 연동 · 실시간 알림)
-Redis 는 부가 기능이다. **Redis 가 없거나 죽어도 ERP 기동과 모든 업무는 그대로 동작**한다.
-접속: `REDIS_HOST`(기본 localhost), `REDIS_PORT`(기본 6380), `REDIS_PASSWORD`. 끄려면 `REDIS_ENABLED=false`.
-
-| 기능 | 언제 | Redis 작업 |
-|---|---|---|
-| 예약 앱 티타임 캐시 무효화 | 티타임 생성/일괄 생성/수정/삭제, 예약 생성/취소 | `{prefix}tee-times:{날짜}:all`, `{prefix}tee-times:{날짜}:{코스ID}` 삭제 |
-| 예약 앱 회원 상태 즉시 반영 | 회원 상태 변경 | `{prefix}auth:member-status:{회원ID}` 삭제. 정지/탈퇴면 `{prefix}auth:revoked-before:{회원ID}` 기록(예약 앱 즉시 로그아웃) |
-| 예약 현황 실시간 알림 | 위 변경 + 예약 확정/결제/완료/노쇼 | `golf:tee-time-events` 채널에 발행 → 구독 → `GET /api/tee-times/stream`(SSE)으로 화면에 전달 |
-
-- `{prefix}` 는 예약 앱의 `app.redis.key-prefix`(기본 `golf-api:`)와 같아야 한다 → `RESERVATION_APP_REDIS_KEY_PREFIX`.
-- 예약 앱이 **같은 Redis** 를 써야 1·2번이 효과가 있다. (예약 앱 컨테이너: `REDIS_HOST=host.docker.internal`, `REDIS_PORT=6380`)
-- 장애 대비
-  - Redis 작업은 커밋 후 별도 스레드에서 실행하고, 실패하면 로그만 남긴다. 예약 앱 캐시는 30초 뒤 저절로 만료된다.
-  - 연결이 끊긴 동안의 명령은 쌓지 않고 바로 실패시킨다(timeout 1초).
-  - 기동 시 Redis 가 없어도 앱은 뜨고, 30초마다 채널 구독을 다시 시도한다.
-  - 발행에 실패하거나 구독이 끊긴 동안에는 알림을 이 서버의 화면에 직접 전달한다.
-  - `/actuator/health` 는 Redis 상태와 무관하다.
-
-#### 실시간 알림 형식 (`golf:tee-time-events`, SSE 이벤트 이름 `tee-time`)
-```json
-{"source":"ERP","type":"RESERVATION_CREATED","golfCourseId":1,"playDate":"2026-11-26",
- "teeTimeId":1,"reservationId":1,"status":"PENDING","occurredAt":"2026-11-25T07:42:17Z"}
-```
-- `type`: `TEE_TIME_CREATED`, `TEE_TIME_UPDATED`, `TEE_TIME_DELETED`, `RESERVATION_CREATED`, `RESERVATION_UPDATED`, `RESERVATION_CANCELLED`
-- 화면은 보고 있는 코스·날짜에 해당하면 `GET /api/tee-times` 를 다시 조회한다. `stream?courseId=1` 처럼 코스를 정하면 그 코스 이벤트만 받는다.
-- 예약 앱이 고객 예약/취소 때 같은 형식(`"source":"APP"`)으로 이 채널에 발행하면 ERP 화면에도 바로 보인다. **예약 앱은 아직 발행하지 않는다.**
 
 ### 정산
 - 해당 일자 `completed_at` 기준 결제 합계(이후 환불 건 포함) - `refunded_at` 기준 환불 합계.

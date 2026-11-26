@@ -1,12 +1,9 @@
 package com.golf.erp.teetime;
 
-import com.golf.erp.redis.TeeTimeSseHub;
 import com.golf.erp.teetime.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -15,21 +12,9 @@ import java.time.LocalDate;
 @RequestMapping("/api/tee-times")
 public class TeeTimeController {
 	private final TeeTimeService service;
-	private final TeeTimeSseHub hub;
 
-	public TeeTimeController(TeeTimeService service, TeeTimeSseHub hub) {
+	public TeeTimeController(TeeTimeService service) {
 		this.service = service;
-		this.hub = hub;
-	}
-
-	/**
-	 * 예약 현황 실시간 알림(SSE). 연결 직후 "connected", 이후 티타임/예약이 바뀔 때마다 "tee-time" 이벤트(TeeTimeEvent).
-	 * 화면은 이벤트의 golfCourseId·playDate 가 보고 있는 범위면 GET /api/tee-times 를 다시 조회한다.
-	 * courseId 를 주면 그 코스 이벤트만 받는다.
-	 */
-	@GetMapping(path = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public SseEmitter stream(@RequestParam(required = false) Long courseId) {
-		return hub.subscribe(courseId);
 	}
 
 	/** 예약 현황: 기간(최대 31일)의 티타임과 활성 예약. to 생략 시 from 하루 */
