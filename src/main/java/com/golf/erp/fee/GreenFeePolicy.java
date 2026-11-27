@@ -1,6 +1,7 @@
 package com.golf.erp.fee;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -9,15 +10,20 @@ import java.time.LocalTime;
 
 /**
  * golf.green_fee_policy. 1인 기준 요금(baseFee)과 1인 할인액(discountAmount).
- * golfCourseId 가 null 이면 전체 골프장 공통 정책.
+ * golfCourseId 가 null 이면 전체 골프장 공통 정책. timeFrom 포함, timeTo 미포함(null 이면 제한 없음).
+ * 테이블에 updated_at 이 없다.
  */
 @Entity
 @Table(name = "green_fee_policy")
 public class GreenFeePolicy {
+	public static final String WEEKDAY = "WEEKDAY";
+	public static final String WEEKEND = "WEEKEND";
+	public static final String HOLIDAY = "HOLIDAY";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "green_fee_policy_id")
-	private Long greenFeePolicyId;
+	private Long id;
 	@Column(name = "golf_course_id")
 	private Long golfCourseId;
 	@Column(name = "policy_name", nullable = false, length = 150)
@@ -37,7 +43,7 @@ public class GreenFeePolicy {
 	@Column(name = "base_fee", nullable = false, precision = 12, scale = 2)
 	private BigDecimal baseFee;
 	@Column(name = "discount_amount", nullable = false, precision = 12, scale = 2)
-	private BigDecimal discountAmount;
+	private BigDecimal discountAmount = BigDecimal.ZERO;
 	@Column(name = "is_active", nullable = false)
 	private boolean active = true;
 	@Column(name = "created_at", nullable = false, updatable = false)
@@ -50,7 +56,7 @@ public class GreenFeePolicy {
 		this.createdAt = now;
 	}
 
-	public void apply(Long golfCourseId, String policyName, LocalDate validFrom, LocalDate validTo, String dayType,
+	public void update(Long golfCourseId, String policyName, LocalDate validFrom, LocalDate validTo, String dayType,
 			Short dayOfWeek, LocalTime timeFrom, LocalTime timeTo, BigDecimal baseFee, BigDecimal discountAmount,
 			boolean active) {
 		this.golfCourseId = golfCourseId;
@@ -70,7 +76,7 @@ public class GreenFeePolicy {
 		this.active = false;
 	}
 
-	/** 날짜·요일·시간 조건이 맞는지 (활성/기간/코스 조건은 조회 쿼리에서 거른다) */
+	/** 날짜·요일·시간 조건이 맞는지 (활성·유효기간·골프장 조건은 조회 쿼리에서 거른다) */
 	public boolean matches(LocalDate date, LocalTime time) {
 		DayOfWeek dow = date.getDayOfWeek();
 		if (dayOfWeek != null && dayOfWeek != dow.getValue())
@@ -78,11 +84,11 @@ public class GreenFeePolicy {
 		if (dayType != null) {
 			boolean weekend = dow == DayOfWeek.SATURDAY || dow == DayOfWeek.SUNDAY;
 			switch (dayType) {
-			case "WEEKDAY" -> {
+			case WEEKDAY -> {
 				if (weekend)
 					return false;
 			}
-			case "WEEKEND" -> {
+			case WEEKEND -> {
 				if (!weekend)
 					return false;
 			}
@@ -96,13 +102,13 @@ public class GreenFeePolicy {
 		return timeTo == null || time.isBefore(timeTo);
 	}
 
-	/** 1인 실결제 요금 */
+	/** 1인 실결제 요금(기본 요금 - 할인) */
 	public BigDecimal netFee() {
 		return baseFee.subtract(discountAmount);
 	}
 
-	public Long getGreenFeePolicyId() {
-		return greenFeePolicyId;
+	public Long getId() {
+		return id;
 	}
 
 	public Long getGolfCourseId() {

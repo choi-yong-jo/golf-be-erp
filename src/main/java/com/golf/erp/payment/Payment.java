@@ -1,14 +1,18 @@
 package com.golf.erp.payment;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Immutable;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * golf.payment. ERP 현장 결제는 pgProvider=ERP, pgTransactionId=ERP-{uuid}, 상태 PAID 로 남긴다
- * (ck_payment_paid: PAID 는 completed_at·pg_transaction_id 필수). 환불은 예약 앱과 같이 같은 행을 REFUNDED 로 바꾼다.
+ * golf.payment (예약 결제·환불). 이 모듈은 조회만 한다. 결제 등록·환불은 예약 처리(현장 결제·취소)와 한 트랜잭션으로 묶여야 해서
+ * 예약 모듈이 SQL 로 쓴다. ERP 현장 결제는 pg_provider=ERP, pg_transaction_id=ERP-{uuid}, 상태 PAID 다
+ * (ck_payment_paid: PAID 는 completed_at·pg_transaction_id 필수).
  */
 @Entity
+@Immutable
 @Table(name = "payment")
 public class Payment {
 	public static final String ERP_PROVIDER = "ERP";
@@ -16,24 +20,24 @@ public class Payment {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "payment_id")
-	private Long paymentId;
+	private Long id;
 	@Column(name = "reservation_id", nullable = false)
 	private Long reservationId;
 	@Enumerated(EnumType.STRING)
 	@Column(name = "payment_type", nullable = false, length = 20)
-	private PaymentType paymentType;
+	private PaymentType type;
 	@Enumerated(EnumType.STRING)
 	@Column(name = "payment_status", nullable = false, length = 20)
-	private PaymentStatus paymentStatus;
+	private PaymentStatus status;
 	@Column(name = "payment_method", length = 30)
-	private String paymentMethod;
+	private String method;
 	@Column(name = "pg_provider", length = 50)
 	private String pgProvider;
 	@Column(name = "pg_transaction_id", length = 200)
 	private String pgTransactionId;
-	@Column(nullable = false, precision = 12, scale = 2)
+	@Column(name = "amount", nullable = false, precision = 12, scale = 2)
 	private BigDecimal amount;
-	@Column(name = "requested_at", nullable = false, updatable = false)
+	@Column(name = "requested_at", nullable = false)
 	private LocalDateTime requestedAt;
 	@Column(name = "completed_at")
 	private LocalDateTime completedAt;
@@ -45,48 +49,28 @@ public class Payment {
 	protected Payment() {
 	}
 
-	public static Payment erpPaid(Long reservationId, String paymentMethod, BigDecimal amount, String transactionId,
-			LocalDateTime now) {
-		Payment p = new Payment();
-		p.reservationId = reservationId;
-		p.paymentType = PaymentType.PAYMENT;
-		p.paymentStatus = PaymentStatus.PAID;
-		p.paymentMethod = paymentMethod;
-		p.pgProvider = ERP_PROVIDER;
-		p.pgTransactionId = transactionId;
-		p.amount = amount;
-		p.requestedAt = now;
-		p.completedAt = now;
-		return p;
-	}
-
-	public boolean isErpPayment() {
+	public boolean isErp() {
 		return ERP_PROVIDER.equals(pgProvider);
 	}
 
-	public void refund(LocalDateTime now) {
-		this.paymentStatus = PaymentStatus.REFUNDED;
-		this.refundedAt = now;
-	}
-
-	public Long getPaymentId() {
-		return paymentId;
+	public Long getId() {
+		return id;
 	}
 
 	public Long getReservationId() {
 		return reservationId;
 	}
 
-	public PaymentType getPaymentType() {
-		return paymentType;
+	public PaymentType getType() {
+		return type;
 	}
 
-	public PaymentStatus getPaymentStatus() {
-		return paymentStatus;
+	public PaymentStatus getStatus() {
+		return status;
 	}
 
-	public String getPaymentMethod() {
-		return paymentMethod;
+	public String getMethod() {
+		return method;
 	}
 
 	public String getPgProvider() {

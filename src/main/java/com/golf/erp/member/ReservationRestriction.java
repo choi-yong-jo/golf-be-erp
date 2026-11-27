@@ -1,11 +1,13 @@
 package com.golf.erp.member;
 
+import com.golf.erp.common.ConflictException;
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 /**
- * golf.reservation_restriction. [startsAt, endsAt) 동안 해당 회원의 ERP 예약 생성을 막는다(endsAt null = 무기한).
- * restrictionType 예: NO_SHOW, PAYMENT_DEFAULT, MANUAL
+ * golf.reservation_restriction. [startsAt, endsAt) 동안 해당 회원의 예약 생성을 막는다(endsAt null = 무기한).
+ * restrictionType 은 CHECK 가 없는 자유 코드다(예: NO_SHOW, PAYMENT_DEFAULT, MANUAL). 예약 앱도 같은 행을 본다.
  */
 @Entity
 @Table(name = "reservation_restriction")
@@ -13,7 +15,7 @@ public class ReservationRestriction {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "restriction_id")
-	private Long restrictionId;
+	private Long id;
 	@Column(name = "member_id", nullable = false)
 	private Long memberId;
 	@Column(name = "restriction_type", nullable = false, length = 30)
@@ -22,7 +24,7 @@ public class ReservationRestriction {
 	private LocalDateTime startsAt;
 	@Column(name = "ends_at")
 	private LocalDateTime endsAt;
-	@Column(nullable = false, length = 1000)
+	@Column(name = "reason", nullable = false, length = 1000)
 	private String reason;
 	@Column(name = "created_by")
 	private Long createdBy;
@@ -33,12 +35,15 @@ public class ReservationRestriction {
 	}
 
 	public ReservationRestriction(Long memberId, String restrictionType, LocalDateTime startsAt,
-			LocalDateTime endsAt, String reason, LocalDateTime now) {
+			LocalDateTime endsAt, String reason, Long createdBy, LocalDateTime now) {
+		if (endsAt != null && !endsAt.isAfter(startsAt))
+			throw new IllegalArgumentException("제한 종료 시각은 시작 시각 이후여야 합니다.");
 		this.memberId = memberId;
 		this.restrictionType = restrictionType;
 		this.startsAt = startsAt;
 		this.endsAt = endsAt;
 		this.reason = reason;
+		this.createdBy = createdBy;
 		this.createdAt = now;
 	}
 
@@ -46,12 +51,27 @@ public class ReservationRestriction {
 		return !at.isBefore(startsAt) && (endsAt == null || at.isBefore(endsAt));
 	}
 
-	public void endAt(LocalDateTime endsAt) {
-		this.endsAt = endsAt;
+	public boolean isEndedAt(LocalDateTime at) {
+		return endsAt != null && !endsAt.isAfter(at);
 	}
 
-	public Long getRestrictionId() {
-		return restrictionId;
+	public boolean isFutureAt(LocalDateTime at) {
+		return startsAt.isAfter(at);
+	}
+
+	/**
+	 * 진행 중인 제한을 지금 끝낸다. ck_restriction_period(ends_at > starts_at) 때문에 시작 시각과 같으면 1초 뒤로 둔다.
+	 */
+	public void end(LocalDateTime now) {
+		if (isEndedAt(now))
+			throw new ConflictException("이미 종료된 예약 제한입니다.");
+		if (isFutureAt(now))
+			throw new ConflictException("아직 시작되지 않은 예약 제한입니다.");
+		this.endsAt = now.isAfter(startsAt) ? now : startsAt.plusSeconds(1);
+	}
+
+	public Long getId() {
+		return id;
 	}
 
 	public Long getMemberId() {

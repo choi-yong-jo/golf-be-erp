@@ -1,13 +1,10 @@
 package com.golf.erp.course;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
-
-public interface GolfCourseRepository extends JpaRepository<GolfCourse, Long> {
+public interface GolfCourseRepository extends JpaRepository<GolfCourse, Long>, JpaSpecificationExecutor<GolfCourse> {
 	boolean existsByCourseCode(String courseCode);
 
-	boolean existsByCourseCodeAndGolfCourseIdNot(String courseCode, Long golfCourseId);
-
-	List<GolfCourse> findAllByOrderByGolfCourseIdAsc();
+	boolean existsByCourseCodeAndIdNot(String courseCode, Long id);
 }

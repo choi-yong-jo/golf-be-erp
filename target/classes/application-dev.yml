@@ -6,13 +6,18 @@ spring:
     driver-class-name: org.postgresql.Driver
   sql:
     init:
-      mode: always                                # dev에서만 schema.sql 실행
-      schema-locations: classpath:db/schema.sql   # src/main/resources/db/schema.sql
+      # dev 에서만 기동 시 스키마 스크립트 실행 (모든 문장이 IF NOT EXISTS 라 반복 실행해도 안전)
+      mode: always
+      schema-locations: classpath:db/golf-erp-db.sql
       continue-on-error: false
-  jpa:
-    hibernate:
-      ddl-auto: validate
+
+erp:
+  jwt:
+    # 개발용 키. 운영은 JWT_SECRET 환경변수로 덮어쓴다
+    secret: ${JWT_SECRET:dev-only-golf-erp-jwt-secret-key-change-me-0123456789}
+  bootstrap:
+    admin-password: ${ERP_ADMIN_PASSWORD:admin1234!}
+
 logging:
   level:
-    com.golf.erp: info
-    org.hibernate.SQL: info
+    com.golf.erp: debug

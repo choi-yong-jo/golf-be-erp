@@ -1,0 +1,106 @@
+paths 191 ops 269
+TeeTimeUpdateRequest: holeType*:string, capacity*:integer, greenFee:number
+StaffRequest: staffNo*:string, name*:string, adminUserId:integer, department:string, positionName:string, phone:string, email:string, hireDate:string
+ShiftUpdateRequest: workDate*:string, scheduledStart*:string, scheduledEnd*:string, memo:string
+ServiceFeeUpdateRequest: feeType*:string[CADDIE_FEE|CART_FEE|RENTAL|LOCKER|ETC], name*:string, chargeUnit*:string[TEAM|PLAYER], holeBasis:integer, amount*:number, validFrom*:string, validTo*:string, active*:boolean
+ScoreSaveRequest: roundCourseId:integer, holeId*:integer, entries*:array
+PlayerUpdateRequest: name*:string, phone:string, handicap:integer, lockerNo:string
+RoleUpdateRequest: name*:string, description:string, active*:boolean
+PermissionCodesRequest: permissionCodes*:array
+RentalEquipmentUpdateRequest: name*:string, category*:string[CLUB|SHOES|WEAR|BAG|UMBRELLA|GPS|OTHER], brand:string, modelName:string, sizeLabel:string, description:string, dailyRentalFee*:number, depositAmount*:number, rentable*:boolean
+PoLineRequest: inventoryItemId*:integer, orderedQuantity*:number, unitCost*:number
+PoRequest: vendorName*:string, expectedAt:string, memo:string, items*:array
+PromotionRequest: code*:string, name*:string, discountType*:string[AMOUNT|PERCENT], discountValue*:number, startsAt*:string, endsAt*:string
+ProductRequest: productCode*:string, productName*:string, productType*:string[FOOD|BEVERAGE|GOODS|SERVICE], unitName:string, salePrice:number
+PayrollUpdateRequest: baseAmount*:number, overtimeAmount:number, deductionAmount:number, memo:string
+ExpenseRequest: golfCourseId*:integer, accountId:integer, expenseDate*:string, category*:string, vendorName:string, description:string, amount*:number, paymentMethod:string
+MemberRequest: memberNo:string, name*:string, phone:string, email:string, birthDate:string, gender:string, address:string, grade:string, marketingConsent:boolean
+JournalEntryRequest: golfCourseId*:integer, businessDate*:string, description:string, sourceType:string, sourceId:integer, lines*:array
+JournalLineRequest: accountId*:integer, debitAmount:number, creditAmount:number, memo:string
+ItemRequest: itemCode*:string, itemName*:string, unitName:string, reorderLevel:number
+HoleUpdateRequest: par*:integer, handicap:integer, distanceBack:integer, distanceRegular:integer, distanceFront:integer, memo:string
+GolfCourseRequest: courseCode*:string, courseName*:string, address:string, phone:string, holeCount:integer
+GreenFeePolicyRequest: golfCourseId:integer, policyName*:string, validFrom:string, validTo:string, dayType:string, dayOfWeek:integer, timeFrom:string, timeTo:string, baseFee*:number, discountAmount:number, active:boolean
+OrderUpdateRequest: discountAmount*:number, memo:string
+FacilityUpdateRequest: facilityCode*:string, facilityName*:string, facilityType*:string
+EquipmentRequest: golfCourseId:integer, code*:string, name*:string, type*:string, serialNo:string, purchaseDate:string, location:string, memo:string
+MaintenanceRequest: type*:string, vendorName:string, description:string
+CourseUpdateRequest: courseCode*:string, courseName*:string, holeCount*:integer, sortOrder:integer
+HoleBulkRequest: holes*:array
+HoleRequest: holeNo*:integer, par*:integer, handicap:integer, distanceBack:integer, distanceRegular:integer, distanceFront:integer, memo:string
+CartUpdateRequest: seatCount*:integer, purchaseDate:string, memo:string
+CaddieUpdateRequest: name*:string, phone:string, grade:string, hiredOn:string, memo:string
+AdminUserUpdateRequest: displayName*:string, role*:string, email:string, phone:string, department:string
+RoleIdsRequest: roleIds*:array
+AccountRequest: code*:string, name*:string, type*:string[ASSET|LIABILITY|EQUITY|REVENUE|EXPENSE], parentAccountId:integer
+TeeTimeCreateRequest: golfCourseId*:integer, course:string, playDate*:string, startTime*:string, holeType:string, capacity:integer, greenFee:number
+TeeTimeGenerateRequest: golfCourseId*:integer, course:string, fromDate*:string, toDate*:string, firstTime*:string, lastTime*:string, intervalMinutes*:integer, daysOfWeek:array, holeType:string, capacity:integer, greenFee:number
+ShiftCreateRequest: staffId*:integer, workDate*:string, scheduledStart*:string, scheduledEnd*:string, memo:string
+ClockRequest: at:string
+ServiceFeeCreateRequest: golfCourseId*:integer, feeType*:string[CADDIE_FEE|CART_FEE|RENTAL|LOCKER|ETC], name*:string, chargeUnit:string[TEAM|PLAYER], holeBasis:integer, amount*:number, validFrom:string, validTo:string, active:boolean
+PaymentCreateRequest: roundPlayerId:integer, method*:string[CASH|CARD|BANK_TRANSFER|KAKAO_PAY|NAVER_PAY|PREPAID|ETC], amount*:number, approvalNo:string, memo:string
+ReasonRequest: reason*:string
+ChargeCreateRequest: roundPlayerId:integer, serviceFeeId:integer, chargeType:string[GREEN_FEE|CADDIE_FEE|CART_FEE|RENTAL|LOCKER|FNB|ETC], description:string, unitPrice:number, quantity:integer, discountAmount:number
+CourseRequest: courseId*:integer
+PlayerRequest: memberId:integer, name:string, phone:string, handicap:integer, lockerNo:string
+CancelRequest: reason*:string
+AssignRequest: resourceType*:string[CADDIE|CART], resourceId*:integer
+SwapRequest: resourceId*:integer, reason:string
+ReleaseRequest: reason:string
+CheckInRequest: reservationId:integer, golfCourseId:integer, teeTimeId:integer, playDate:string, teeOffTime:string, plannedHoles:integer, memo:string, players:array
+RoleCreateRequest: code*:string, name*:string, description:string, permissionCodes:array
+ReservationCreateRequest: teeTimeId*:integer, memberId*:integer, playerCount*:integer, memo:string, companions:array
+PaymentRequest: paymentMethod*:string
+RentalCreateRequest: golfCourseId*:integer, reservationId:integer, roundId:integer, memberId:integer, renterName:string, renterPhone:string, memo:string, items*:array
+RentalItemRequest: rentalEquipmentId*:integer, equipmentId:integer, quantity*:integer, dailyRentalFee:number, rentalDays:integer, depositAmount:number, conditionOut:string
+RentalReturnRequest: items*:array
+ReturnItemRequest: itemId*:integer, returnedQuantity:integer, damagedQuantity:integer, lostQuantity:integer, conditionIn:string, damageFee:number
+RentalPaymentRequest: type*:string[RENTAL_FEE|DEPOSIT|DAMAGE_FEE|REFUND], method*:string[CASH|CARD|BANK_TRANSFER|KAKAO_PAY|NAVER_PAY|ETC], amount*:number, approvalNo:string
+IssueItemRequest: itemId*:integer, equipmentId:integer, conditionOut:string
+RentalIssueRequest: dueAt:string, items:array
+RentalExtendRequest: dueAt*:string, addRentalDays:integer, reason:string
+RentalEquipmentCreateRequest: code*:string, name*:string, category*:string[CLUB|SHOES|WEAR|BAG|UMBRELLA|GPS|OTHER], brand:string, modelName:string, sizeLabel:string, description:string, dailyRentalFee*:number, depositAmount*:number, rentable:boolean
+StockTransactionRequest: type*:string[STOCK_IN|RENT_OUT|RETURN|MAINTENANCE_OUT|MAINTENANCE_IN|LOSS|ADJUSTMENT], quantity:integer, targetAvailable:integer, lossFrom:string[AVAILABLE|MAINTENANCE], reason:string
+ReceiveRequest: lines*:array, facilityId:integer, memo:string
+RedemptionRequest: memberId*:integer, reservationId:integer, baseAmount*:number
+PayrollCreateRequest: staffId*:integer, payPeriod*:string, baseAmount*:number, overtimeAmount:number, deductionAmount:number, memo:string
+ExpenseRejectRequest: reason:string
+ExpensePayRequest: paymentMethod:string
+NotificationCreateRequest: memberId:integer, reservationId:integer, channel*:string[SMS|EMAIL|PUSH|KAKAO], templateCode:string, destination*:string, message*:string, scheduledAt:string
+RetryRequest: scheduledAt:string
+MarkSentRequest: providerMessageId:string
+MarkFailedRequest: errorMessage*:string, providerMessageId:string
+RestrictionRequest: restrictionType*:string, startsAt:string, endsAt:string, reason*:string
+VoidRequest: reason:string
+TransactionRequest: inventoryItemId*:integer, facilityId:integer, type*:string[RECEIPT|ISSUE|ADJUSTMENT|RETURN], direction:string[INCREASE|DECREASE], quantity*:number, unitCost:number, referenceNo:string, occurredAt:string, memo:string
+InquiryCreateRequest: memberId:integer, reservationId:integer, inquiryType*:string, subject*:string, content*:string, receivedAt:string
+InquiryRespondRequest: response*:string, resolve:boolean
+InquiryAssignRequest: adminUserId:integer
+ClosureRequest: closureStart*:string, closureEnd*:string, closureType:string, reason*:string
+OrderCreateRequest: facilityId*:integer, roundId:integer, memberId:integer, items*:array, discountAmount:number, memo:string
+OrderItemRequest: productId*:integer, quantity*:number, unitPrice:number, discountAmount:number
+FacilityCreateRequest: golfCourseId*:integer, facilityCode*:string, facilityName*:string, facilityType*:string
+MaintenanceCompleteRequest: cost:number, vendorName:string
+SettlementReopenRequest: reason*:string
+SettlementCloseRequest: memo:string
+SettlementCalculateRequest: golfCourseId*:integer, businessDate*:string, memo:string
+CourseCreateRequest: golfCourseId*:integer, courseCode*:string, courseName*:string, holeCount:integer, sortOrder:integer
+CartCreateRequest: golfCourseId*:integer, cartNo*:string, seatCount:integer, purchaseDate:string, memo:string
+CaddieCreateRequest: golfCourseId*:integer, caddieNo*:string, name*:string, phone:string, grade:string, hiredOn:string, memo:string
+RefreshRequest: refreshToken*:string
+ChangePasswordRequest: currentPassword*:string, newPassword*:string
+LoginRequest: username*:string, password*:string
+AdminUserCreateRequest: username*:string, password*:string, displayName*:string, role*:string, email:string, phone:string, department:string, roleIds:array
+ResetPasswordRequest: newPassword*:string
+TeeTimeStatusRequest: status*:string[OPEN|BOOKED|BLOCKED|CLOSED]
+StaffStatusRequest: status*:string[ACTIVE|ON_LEAVE|RESIGNED]
+MemoRequest: memo:string
+RentalItemFeeRequest: dailyRentalFee:number, rentalDays:integer, damageFee:number, reason:string
+RentalEquipmentFlagsRequest: active*:boolean, rentable*:boolean
+ActiveRequest: active*:boolean
+MemberStatusRequest: status*:string[ACTIVE|SUSPENDED|WITHDRAWN], reason:string
+GolfCourseStatusRequest: status*:string[OPEN|CLOSED], active:boolean
+EquipmentStatusRequest: status*:string[AVAILABLE|IN_USE|MAINTENANCE|RETIRED]
+CourseStatusRequest: status*:string[OPEN|MAINTENANCE|CLOSED], active:boolean
+CartStatusRequest: status*:string[ACTIVE|MAINTENANCE|RETIRED]
+CaddieStatusRequest: status*:string[ACTIVE|ON_LEAVE|RETIRED]

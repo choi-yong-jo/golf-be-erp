@@ -1,0 +1,674 @@
+account.account_code character varying
+account.account_id bigint
+account.account_name character varying
+account.account_type character varying
+account.is_active boolean
+account.parent_account_id bigint
+admin_user.admin_user_id bigint
+admin_user.created_at timestamp without time zone
+admin_user.department character varying
+admin_user.display_name character varying
+admin_user.email character varying
+admin_user.is_active boolean
+admin_user.last_login_at timestamp without time zone
+admin_user.password_hash character varying
+admin_user.phone character varying
+admin_user.role character varying
+admin_user.updated_at timestamp without time zone
+admin_user.username character varying
+admin_user_role.admin_user_id bigint
+admin_user_role.assigned_at timestamp without time zone
+admin_user_role.assigned_by bigint
+admin_user_role.system_role_id bigint
+audit_log.action character varying
+audit_log.actor_username character varying
+audit_log.audit_log_id bigint
+audit_log.created_at timestamp without time zone
+audit_log.details jsonb
+audit_log.entity_id bigint
+audit_log.entity_type character varying
+board.answer_content text
+board.answer_status character varying
+board.answered_at timestamp without time zone
+board.answered_by bigint
+board.author_admin_user_id bigint
+board.author_member_id bigint
+board.board_id bigint
+board.board_type character varying
+board.content text
+board.created_at timestamp without time zone
+board.deleted_at timestamp without time zone
+board.display_order integer
+board.event_end_at timestamp without time zone
+board.event_start_at timestamp without time zone
+board.guest_email character varying
+board.guest_name character varying
+board.guest_phone character varying
+board.inquiry_category character varying
+board.inquiry_status character varying
+board.is_pinned boolean
+board.post_status character varying
+board.publish_end_at timestamp without time zone
+board.publish_start_at timestamp without time zone
+board.reservation_id bigint
+board.title character varying
+board.updated_at timestamp without time zone
+board.view_count bigint
+board.visibility character varying
+board_file.attached_at timestamp without time zone
+board_file.board_id bigint
+board_file.caption character varying
+board_file.common_file_id bigint
+board_file.display_order smallint
+caddie.caddie_id bigint
+caddie.caddie_name character varying
+caddie.caddie_no character varying
+caddie.caddie_status character varying
+caddie.created_at timestamp without time zone
+caddie.employment_status character varying
+caddie.golf_course_id bigint
+caddie.grade character varying
+caddie.hire_date date
+caddie.hired_on date
+caddie.memo character varying
+caddie.phone character varying
+caddie.updated_at timestamp without time zone
+cart.cart_code character varying
+cart.cart_id bigint
+cart.cart_no character varying
+cart.cart_status character varying
+cart.created_at timestamp without time zone
+cart.golf_course_id bigint
+cart.last_maintenance_at timestamp without time zone
+cart.memo character varying
+cart.purchase_date date
+cart.seat_count smallint
+cart.updated_at timestamp without time zone
+common_file.checksum_sha256 character
+common_file.common_file_id bigint
+common_file.deleted_at timestamp without time zone
+common_file.file_category character varying
+common_file.file_extension character varying
+common_file.file_size_bytes bigint
+common_file.image_height integer
+common_file.image_width integer
+common_file.mime_type character varying
+common_file.original_filename character varying
+common_file.storage_bucket character varying
+common_file.storage_key character varying
+common_file.storage_provider character varying
+common_file.stored_filename character varying
+common_file.upload_status character varying
+common_file.uploaded_at timestamp without time zone
+common_file.uploaded_by_admin_user_id bigint
+common_file.uploaded_by_member_id bigint
+course.course_code character varying
+course.course_id bigint
+course.course_name character varying
+course.course_status character varying
+course.created_at timestamp without time zone
+course.golf_course_id bigint
+course.hole_count smallint
+course.is_active boolean
+course.sort_order smallint
+course.updated_at timestamp without time zone
+customer_notification.channel character varying
+customer_notification.destination character varying
+customer_notification.error_message character varying
+customer_notification.member_id bigint
+customer_notification.message text
+customer_notification.notification_id bigint
+customer_notification.provider_message_id character varying
+customer_notification.reservation_id bigint
+customer_notification.scheduled_at timestamp without time zone
+customer_notification.send_status character varying
+customer_notification.sent_at timestamp without time zone
+customer_notification.template_code character varying
+daily_settlement.business_date date
+daily_settlement.charge_total numeric
+daily_settlement.closed_at timestamp without time zone
+daily_settlement.closed_by bigint
+daily_settlement.created_at timestamp without time zone
+daily_settlement.daily_settlement_id bigint
+daily_settlement.discount_total numeric
+daily_settlement.golf_course_id bigint
+daily_settlement.memo character varying
+daily_settlement.payment_total numeric
+daily_settlement.player_count integer
+daily_settlement.round_count integer
+daily_settlement.settlement_status character varying
+daily_settlement.unpaid_total numeric
+daily_settlement.updated_at timestamp without time zone
+daily_settlement_item.amount numeric
+daily_settlement_item.daily_settlement_id bigint
+daily_settlement_item.daily_settlement_item_id bigint
+daily_settlement_item.item_code character varying
+daily_settlement_item.item_count integer
+daily_settlement_item.item_type character varying
+equipment.equipment_code character varying
+equipment.equipment_id bigint
+equipment.equipment_name character varying
+equipment.equipment_status character varying
+equipment.equipment_type character varying
+equipment.golf_course_id bigint
+equipment.location character varying
+equipment.memo character varying
+equipment.purchase_date date
+equipment.serial_no character varying
+equipment_maintenance.completed_at timestamp without time zone
+equipment_maintenance.cost numeric
+equipment_maintenance.description character varying
+equipment_maintenance.equipment_id bigint
+equipment_maintenance.maintenance_id bigint
+equipment_maintenance.maintenance_status character varying
+equipment_maintenance.maintenance_type character varying
+equipment_maintenance.reported_at timestamp without time zone
+equipment_maintenance.reported_by bigint
+equipment_maintenance.started_at timestamp without time zone
+equipment_maintenance.vendor_name character varying
+equipment_rental.created_at timestamp without time zone
+equipment_rental.damage_fee_total numeric
+equipment_rental.deposit_total numeric
+equipment_rental.due_at timestamp without time zone
+equipment_rental.equipment_rental_id bigint
+equipment_rental.golf_course_id bigint
+equipment_rental.member_id bigint
+equipment_rental.memo character varying
+equipment_rental.received_by bigint
+equipment_rental.rental_fee_total numeric
+equipment_rental.rental_no character varying
+equipment_rental.rental_status character varying
+equipment_rental.rented_at timestamp without time zone
+equipment_rental.renter_name character varying
+equipment_rental.renter_phone character varying
+equipment_rental.reservation_id bigint
+equipment_rental.returned_at timestamp without time zone
+equipment_rental.returned_to bigint
+equipment_rental.round_id bigint
+equipment_rental_history.action_type character varying
+equipment_rental_history.actor_admin_user_id bigint
+equipment_rental_history.condition_note character varying
+equipment_rental_history.equipment_rental_id bigint
+equipment_rental_history.equipment_rental_item_id bigint
+equipment_rental_history.occurred_at timestamp without time zone
+equipment_rental_history.quantity integer
+equipment_rental_history.rental_history_id bigint
+equipment_rental_item.condition_in character varying
+equipment_rental_item.condition_out character varying
+equipment_rental_item.daily_rental_fee numeric
+equipment_rental_item.damage_fee numeric
+equipment_rental_item.deposit_amount numeric
+equipment_rental_item.equipment_id bigint
+equipment_rental_item.equipment_rental_id bigint
+equipment_rental_item.equipment_rental_item_id bigint
+equipment_rental_item.item_status character varying
+equipment_rental_item.quantity integer
+equipment_rental_item.rental_days integer
+equipment_rental_item.rental_equipment_id bigint
+equipment_rental_item.returned_at timestamp without time zone
+equipment_rental_item.returned_quantity integer
+equipment_rental_payment.amount numeric
+equipment_rental_payment.approval_no character varying
+equipment_rental_payment.cancelled_at timestamp without time zone
+equipment_rental_payment.equipment_rental_id bigint
+equipment_rental_payment.paid_at timestamp without time zone
+equipment_rental_payment.payment_method character varying
+equipment_rental_payment.payment_status character varying
+equipment_rental_payment.payment_type character varying
+equipment_rental_payment.received_by bigint
+equipment_rental_payment.rental_payment_id bigint
+facility.facility_code character varying
+facility.facility_id bigint
+facility.facility_name character varying
+facility.facility_type character varying
+facility.golf_course_id bigint
+facility.is_active boolean
+facility_booking.base_amount numeric
+facility_booking.booking_end_at timestamp without time zone
+facility_booking.booking_no character varying
+facility_booking.booking_start_at timestamp without time zone
+facility_booking.booking_status character varying
+facility_booking.cancel_reason character varying
+facility_booking.cancelled_at timestamp without time zone
+facility_booking.check_in_at timestamp without time zone
+facility_booking.check_out_at timestamp without time zone
+facility_booking.created_at timestamp without time zone
+facility_booking.created_by bigint
+facility_booking.discount_amount numeric
+facility_booking.facility_booking_id bigint
+facility_booking.facility_unit_id bigint
+facility_booking.guest_count integer
+facility_booking.guest_name character varying
+facility_booking.guest_phone character varying
+facility_booking.member_id bigint
+facility_booking.payment_status character varying
+facility_booking.special_request character varying
+facility_booking.stay_nights smallint
+facility_booking.total_amount numeric
+facility_booking.updated_at timestamp without time zone
+facility_unit.base_price numeric
+facility_unit.capacity integer
+facility_unit.facility_id bigint
+facility_unit.facility_unit_id bigint
+facility_unit.memo character varying
+facility_unit.unit_code character varying
+facility_unit.unit_name character varying
+facility_unit.unit_status character varying
+golf_course.address character varying
+golf_course.course_code character varying
+golf_course.course_name character varying
+golf_course.course_status character varying
+golf_course.created_at timestamp without time zone
+golf_course.golf_course_id bigint
+golf_course.hole_count integer
+golf_course.is_active boolean
+golf_course.phone character varying
+golf_course.updated_at timestamp without time zone
+golf_course_closure.closure_end timestamp without time zone
+golf_course_closure.closure_id bigint
+golf_course_closure.closure_start timestamp without time zone
+golf_course_closure.closure_type character varying
+golf_course_closure.golf_course_id bigint
+golf_course_closure.is_active boolean
+golf_course_closure.reason character varying
+green_fee_policy.base_fee numeric
+green_fee_policy.created_at timestamp without time zone
+green_fee_policy.day_of_week smallint
+green_fee_policy.day_type character varying
+green_fee_policy.discount_amount numeric
+green_fee_policy.golf_course_id bigint
+green_fee_policy.green_fee_policy_id bigint
+green_fee_policy.is_active boolean
+green_fee_policy.policy_name character varying
+green_fee_policy.time_from time without time zone
+green_fee_policy.time_to time without time zone
+green_fee_policy.valid_from date
+green_fee_policy.valid_to date
+hole.course_id bigint
+hole.created_at timestamp without time zone
+hole.distance_back integer
+hole.distance_front integer
+hole.distance_regular integer
+hole.handicap smallint
+hole.hole_id bigint
+hole.hole_no smallint
+hole.memo character varying
+hole.par smallint
+hole.updated_at timestamp without time zone
+inventory_item.inventory_item_id bigint
+inventory_item.is_active boolean
+inventory_item.item_code character varying
+inventory_item.item_name character varying
+inventory_item.reorder_level numeric
+inventory_item.unit_name character varying
+inventory_transaction.actor_admin_user_id bigint
+inventory_transaction.facility_id bigint
+inventory_transaction.inventory_item_id bigint
+inventory_transaction.inventory_transaction_id bigint
+inventory_transaction.memo character varying
+inventory_transaction.occurred_at timestamp without time zone
+inventory_transaction.quantity numeric
+inventory_transaction.reference_no character varying
+inventory_transaction.transaction_type character varying
+inventory_transaction.unit_cost numeric
+journal_entry.business_date date
+journal_entry.created_at timestamp without time zone
+journal_entry.created_by bigint
+journal_entry.description character varying
+journal_entry.entry_no character varying
+journal_entry.entry_status character varying
+journal_entry.golf_course_id bigint
+journal_entry.journal_entry_id bigint
+journal_entry.posted_at timestamp without time zone
+journal_entry.source_id bigint
+journal_entry.source_type character varying
+journal_line.account_id bigint
+journal_line.credit_amount numeric
+journal_line.debit_amount numeric
+journal_line.journal_entry_id bigint
+journal_line.journal_line_id bigint
+journal_line.memo character varying
+member.address character varying
+member.birth_date date
+member.created_at timestamp without time zone
+member.email character varying
+member.gender character varying
+member.login_id character varying
+member.marketing_consent boolean
+member.member_grade character varying
+member.member_id bigint
+member.member_name character varying
+member.member_no character varying
+member.member_status character varying
+member.phone character varying
+member.role character varying
+member.updated_at timestamp without time zone
+operating_expense.account_id bigint
+operating_expense.amount numeric
+operating_expense.approval_status character varying
+operating_expense.approved_by bigint
+operating_expense.category character varying
+operating_expense.created_at timestamp without time zone
+operating_expense.created_by bigint
+operating_expense.description character varying
+operating_expense.expense_date date
+operating_expense.golf_course_id bigint
+operating_expense.operating_expense_id bigint
+operating_expense.payment_method character varying
+operating_expense.vendor_name character varying
+payment.amount numeric
+payment.completed_at timestamp without time zone
+payment.failure_reason character varying
+payment.payment_id bigint
+payment.payment_method character varying
+payment.payment_status character varying
+payment.payment_type character varying
+payment.pg_provider character varying
+payment.pg_transaction_id character varying
+payment.refunded_at timestamp without time zone
+payment.requested_at timestamp without time zone
+payment.reservation_id bigint
+payroll.base_amount numeric
+payroll.deduction_amount numeric
+payroll.memo character varying
+payroll.net_amount numeric
+payroll.overtime_amount numeric
+payroll.paid_at timestamp without time zone
+payroll.pay_period date
+payroll.payroll_id bigint
+payroll.payroll_status character varying
+payroll.staff_id bigint
+permission.module_code character varying
+permission.permission_code character varying
+permission.permission_id bigint
+permission.permission_name character varying
+promotion.discount_type character varying
+promotion.discount_value numeric
+promotion.ends_at timestamp without time zone
+promotion.is_active boolean
+promotion.promotion_code character varying
+promotion.promotion_id bigint
+promotion.promotion_name character varying
+promotion.starts_at timestamp without time zone
+promotion_redemption.discount_amount numeric
+promotion_redemption.member_id bigint
+promotion_redemption.promotion_id bigint
+promotion_redemption.promotion_redemption_id bigint
+promotion_redemption.redeemed_at timestamp without time zone
+promotion_redemption.reservation_id bigint
+purchase_order.created_by bigint
+purchase_order.expected_at date
+purchase_order.memo character varying
+purchase_order.ordered_at date
+purchase_order.po_no character varying
+purchase_order.purchase_order_id bigint
+purchase_order.status character varying
+purchase_order.total_amount numeric
+purchase_order.vendor_name character varying
+purchase_order_item.inventory_item_id bigint
+purchase_order_item.ordered_quantity numeric
+purchase_order_item.purchase_order_id bigint
+purchase_order_item.purchase_order_item_id bigint
+purchase_order_item.received_quantity numeric
+purchase_order_item.unit_cost numeric
+rental_equipment.brand character varying
+rental_equipment.daily_rental_fee numeric
+rental_equipment.deposit_amount numeric
+rental_equipment.description character varying
+rental_equipment.equipment_category character varying
+rental_equipment.equipment_code character varying
+rental_equipment.equipment_name character varying
+rental_equipment.is_active boolean
+rental_equipment.is_rentable boolean
+rental_equipment.model_name character varying
+rental_equipment.rental_equipment_id bigint
+rental_equipment.size_label character varying
+rental_equipment_stock.available_quantity integer
+rental_equipment_stock.golf_course_id bigint
+rental_equipment_stock.maintenance_quantity integer
+rental_equipment_stock.rental_equipment_id bigint
+rental_equipment_stock.rental_equipment_stock_id bigint
+rental_equipment_stock.rented_quantity integer
+rental_equipment_stock.total_quantity integer
+rental_equipment_stock.updated_at timestamp without time zone
+rental_equipment_stock_txn.actor_admin_user_id bigint
+rental_equipment_stock_txn.golf_course_id bigint
+rental_equipment_stock_txn.occurred_at timestamp without time zone
+rental_equipment_stock_txn.quantity integer
+rental_equipment_stock_txn.reason character varying
+rental_equipment_stock_txn.reference_id bigint
+rental_equipment_stock_txn.reference_type character varying
+rental_equipment_stock_txn.rental_equipment_id bigint
+rental_equipment_stock_txn.stock_txn_id bigint
+rental_equipment_stock_txn.transaction_type character varying
+reservation.cancel_reason character varying
+reservation.cancelled_at timestamp without time zone
+reservation.confirmed_at timestamp without time zone
+reservation.created_at timestamp without time zone
+reservation.discount_amount numeric
+reservation.golf_course_id bigint
+reservation.green_fee_amount numeric
+reservation.member_id bigint
+reservation.memo character varying
+reservation.payment_started_at timestamp without time zone
+reservation.play_at timestamp without time zone
+reservation.player_count integer
+reservation.reservation_id bigint
+reservation.reservation_no character varying
+reservation.reservation_status character varying
+reservation.reserved_at timestamp without time zone
+reservation.tee_time_id bigint
+reservation.total_amount numeric
+reservation.updated_at timestamp without time zone
+reservation.version bigint
+reservation_history.action_type character varying
+reservation_history.actor_member_id bigint
+reservation_history.after_amount numeric
+reservation_history.after_status character varying
+reservation_history.after_tee_time_id bigint
+reservation_history.before_amount numeric
+reservation_history.before_status character varying
+reservation_history.before_tee_time_id bigint
+reservation_history.created_at timestamp without time zone
+reservation_history.reason character varying
+reservation_history.reservation_history_id bigint
+reservation_history.reservation_id bigint
+reservation_player.is_booking_member boolean
+reservation_player.member_id bigint
+reservation_player.phone character varying
+reservation_player.player_name character varying
+reservation_player.player_order smallint
+reservation_player.reservation_id bigint
+reservation_player.reservation_player_id bigint
+reservation_restriction.created_at timestamp without time zone
+reservation_restriction.created_by bigint
+reservation_restriction.ends_at timestamp without time zone
+reservation_restriction.member_id bigint
+reservation_restriction.reason character varying
+reservation_restriction.restriction_id bigint
+reservation_restriction.restriction_type character varying
+reservation_restriction.starts_at timestamp without time zone
+role_permission.permission_id bigint
+role_permission.system_role_id bigint
+round.cancel_reason character varying
+round.cancelled_at timestamp without time zone
+round.checked_in_at timestamp without time zone
+round.created_at timestamp without time zone
+round.created_by bigint
+round.current_course_id bigint
+round.finished_at timestamp without time zone
+round.golf_course_id bigint
+round.memo character varying
+round.planned_holes smallint
+round.play_date date
+round.reservation_id bigint
+round.round_id bigint
+round.round_no character varying
+round.round_status character varying
+round.settlement_status character varying
+round.started_at timestamp without time zone
+round.tee_off_time time without time zone
+round.tee_time_id bigint
+round.updated_at timestamp without time zone
+round.version bigint
+round_assignment.assigned_at timestamp without time zone
+round_assignment.assigned_by bigint
+round_assignment.caddie_id bigint
+round_assignment.cart_id bigint
+round_assignment.release_reason character varying
+round_assignment.released_at timestamp without time zone
+round_assignment.resource_type character varying
+round_assignment.round_assignment_id bigint
+round_assignment.round_id bigint
+round_charge.amount numeric
+round_charge.charge_type character varying
+round_charge.created_at timestamp without time zone
+round_charge.created_by bigint
+round_charge.description character varying
+round_charge.discount_amount numeric
+round_charge.is_void boolean
+round_charge.quantity smallint
+round_charge.round_charge_id bigint
+round_charge.round_id bigint
+round_charge.round_player_id bigint
+round_charge.unit_price numeric
+round_charge.void_reason character varying
+round_charge.voided_at timestamp without time zone
+round_course.course_id bigint
+round_course.finished_at timestamp without time zone
+round_course.round_course_id bigint
+round_course.round_id bigint
+round_course.seq_no smallint
+round_course.started_at timestamp without time zone
+round_event.actor_admin_user_id bigint
+round_event.course_id bigint
+round_event.event_type character varying
+round_event.message character varying
+round_event.occurred_at timestamp without time zone
+round_event.round_event_id bigint
+round_event.round_id bigint
+round_event.round_player_id bigint
+round_payment.amount numeric
+round_payment.approval_no character varying
+round_payment.cancel_reason character varying
+round_payment.cancelled_at timestamp without time zone
+round_payment.memo character varying
+round_payment.paid_at timestamp without time zone
+round_payment.payment_method character varying
+round_payment.payment_status character varying
+round_payment.received_by bigint
+round_payment.round_id bigint
+round_payment.round_payment_id bigint
+round_payment.round_player_id bigint
+round_player.checked_in_at timestamp without time zone
+round_player.checked_out_at timestamp without time zone
+round_player.handicap smallint
+round_player.holes_played smallint
+round_player.locker_no character varying
+round_player.member_id bigint
+round_player.par_played smallint
+round_player.phone character varying
+round_player.player_name character varying
+round_player.player_order smallint
+round_player.round_id bigint
+round_player.round_player_id bigint
+round_player.total_putts smallint
+round_player.total_strokes smallint
+score.fairway_hit boolean
+score.hole_id bigint
+score.penalties smallint
+score.putts smallint
+score.recorded_at timestamp without time zone
+score.recorded_by bigint
+score.round_course_id bigint
+score.round_player_id bigint
+score.score_id bigint
+score.strokes smallint
+score.updated_at timestamp without time zone
+service_fee.amount numeric
+service_fee.charge_unit character varying
+service_fee.created_at timestamp without time zone
+service_fee.fee_name character varying
+service_fee.fee_type character varying
+service_fee.golf_course_id bigint
+service_fee.hole_basis smallint
+service_fee.is_active boolean
+service_fee.service_fee_id bigint
+service_fee.updated_at timestamp without time zone
+service_fee.valid_from date
+service_fee.valid_to date
+settlement.created_at timestamp without time zone
+settlement.gross_amount numeric
+settlement.net_amount numeric
+settlement.refund_amount numeric
+settlement.settlement_date date
+settlement.settlement_id bigint
+settlement.settlement_status character varying
+staff.admin_user_id bigint
+staff.created_at timestamp without time zone
+staff.department character varying
+staff.email character varying
+staff.employment_status character varying
+staff.hire_date date
+staff.phone character varying
+staff.position_name character varying
+staff.staff_id bigint
+staff.staff_name character varying
+staff.staff_no character varying
+staff.updated_at timestamp without time zone
+staff_shift.actual_end timestamp without time zone
+staff_shift.actual_start timestamp without time zone
+staff_shift.memo character varying
+staff_shift.scheduled_end time without time zone
+staff_shift.scheduled_start time without time zone
+staff_shift.shift_status character varying
+staff_shift.staff_id bigint
+staff_shift.staff_shift_id bigint
+staff_shift.work_date date
+store_brand.brand_code character varying
+store_brand.brand_name character varying
+store_brand.business_name character varying
+store_brand.business_registration_no character varying
+store_brand.contact_email character varying
+store_brand.contact_name character varying
+store_brand.contact_phone character varying
+store_brand.created_at timestamp without time zone
+store_brand.created_by bigint
+store_brand.is_active boolean
+store_brand.store_brand_id bigint
+store_brand.updated_at timestamp without time zone
+store_brand.updated_by bigint
+system_role.description character varying
+system_role.is_active boolean
+system_role.role_code character varying
+system_role.role_name character varying
+system_role.system_role_id bigint
+tee_time.capacity smallint
+tee_time.course character varying
+tee_time.golf_course_id bigint
+tee_time.green_fee numeric
+tee_time.hole_type character varying
+tee_time.play_date date
+tee_time.start_time time without time zone
+tee_time.tee_time_id bigint
+tee_time.tee_time_status character varying
+tee_time.version bigint
+tenant_store.created_at timestamp without time zone
+tenant_store.created_by bigint
+tenant_store.golf_course_id bigint
+tenant_store.is_external_tenant boolean
+tenant_store.lease_end_date date
+tenant_store.lease_start_date date
+tenant_store.location character varying
+tenant_store.manager_name character varying
+tenant_store.manager_phone character varying
+tenant_store.memo character varying
+tenant_store.monthly_rent numeric
+tenant_store.store_brand_id bigint
+tenant_store.store_code character varying
+tenant_store.store_id bigint
+tenant_store.store_name character varying
+tenant_store.store_status character varying
+tenant_store.store_type character varying
+tenant_store.updated_at timestamp without time zone
+tenant_store.updated_by bigint

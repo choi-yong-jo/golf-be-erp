@@ -1,13 +1,14 @@
 package com.golf.erp.reservation;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * golf.reservation_history. ERP가 바꾼 예약마다 한 줄씩 남긴다.
- * actionType: CREATE, CONFIRM, PAYMENT, CANCEL, COMPLETE, NO_SHOW, MEMO.
- * actorMemberId 는 회원이 한 행동일 때만 채운다(ERP 관리자 행동은 null).
+ * golf.reservation_history. 예약이 바뀔 때마다 한 줄씩 남긴다(예약 앱도 같은 테이블에 쓴다).
+ * ERP 의 action_type: CREATE, CONFIRM, PAYMENT, CANCEL, COMPLETE, NO_SHOW, MEMO.
+ * actor_member_id 는 회원이 한 행동일 때만 채운다(ERP 직원 행동은 null, 직원 아이디는 reason 앞에 남긴다).
  */
 @Entity
 @Table(name = "reservation_history")
@@ -15,7 +16,7 @@ public class ReservationHistory {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "reservation_history_id")
-	private Long reservationHistoryId;
+	private Long id;
 	@Column(name = "reservation_id", nullable = false)
 	private Long reservationId;
 	@Column(name = "action_type", nullable = false, length = 30)
@@ -32,7 +33,7 @@ public class ReservationHistory {
 	private BigDecimal beforeAmount;
 	@Column(name = "after_amount", precision = 12, scale = 2)
 	private BigDecimal afterAmount;
-	@Column(length = 1000)
+	@Column(name = "reason", length = 1000)
 	private String reason;
 	@Column(name = "actor_member_id")
 	private Long actorMemberId;
@@ -42,25 +43,28 @@ public class ReservationHistory {
 	protected ReservationHistory() {
 	}
 
-	/** before: 변경 전 상태/티타임/금액 (생성이면 null) */
+	/**
+	 * @param after        변경 후 예약
+	 * @param beforeStatus 변경 전 상태(생성이면 null). 티타임·금액은 ERP 처리에서 바뀌지 않으므로 변경 후 값과 같게 남긴다.
+	 */
 	public static ReservationHistory of(String actionType, Reservation after, ReservationStatus beforeStatus,
-			Long beforeTeeTimeId, BigDecimal beforeAmount, String reason, LocalDateTime now) {
+			String reason, LocalDateTime now) {
 		ReservationHistory h = new ReservationHistory();
-		h.reservationId = after.getReservationId();
+		h.reservationId = after.getId();
 		h.actionType = actionType;
 		h.beforeStatus = beforeStatus == null ? null : beforeStatus.name();
-		h.afterStatus = after.getReservationStatus().name();
-		h.beforeTeeTimeId = beforeTeeTimeId;
+		h.afterStatus = after.getStatus().name();
+		h.beforeTeeTimeId = beforeStatus == null ? null : after.getTeeTimeId();
 		h.afterTeeTimeId = after.getTeeTimeId();
-		h.beforeAmount = beforeAmount;
+		h.beforeAmount = beforeStatus == null ? null : after.getTotalAmount();
 		h.afterAmount = after.getTotalAmount();
-		h.reason = reason;
+		h.reason = reason == null || reason.length() <= 1000 ? reason : reason.substring(0, 1000);
 		h.createdAt = now;
 		return h;
 	}
 
-	public Long getReservationHistoryId() {
-		return reservationHistoryId;
+	public Long getId() {
+		return id;
 	}
 
 	public Long getReservationId() {

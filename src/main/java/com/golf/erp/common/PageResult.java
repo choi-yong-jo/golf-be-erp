@@ -1,12 +1,15 @@
 package com.golf.erp.common;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 
-/** 목록 응답 공통 형식: {items, page, size, total} */
+import java.util.List;
+import java.util.function.Function;
+
+/** 목록 응답 공통 형식: {items, page, size, total} (page 는 0부터) */
 public record PageResult<T>(List<T> items, int page, int size, long total) {
 
-	public static void validate(int page, int size) {
-		if (page < 0 || size < 1 || size > 100)
-			throw new IllegalArgumentException("page는 0 이상, size는 1~100이어야 합니다.");
+	public static <E, T> PageResult<T> of(Page<E> page, Function<? super E, ? extends T> mapper) {
+		return new PageResult<>(page.getContent().stream().<T>map(mapper).toList(), page.getNumber(), page.getSize(),
+				page.getTotalElements());
 	}
 }

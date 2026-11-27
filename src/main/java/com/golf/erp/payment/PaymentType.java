@@ -1,6 +1,6 @@
 package com.golf.erp.payment;
 
-/** DB CHECK ck_payment_type 와 동일. ERP는 PAYMENT 만 만든다(환불은 같은 행을 REFUNDED 로). */
+/** 결제 유형(ck_payment_type). REFUND 는 예약 앱이 환불을 별도 행으로 남길 때 쓴다(ERP 는 만들지 않음). */
 public enum PaymentType {
 	PAYMENT, REFUND
 }

@@ -1,17 +1,14 @@
 package com.golf.erp.member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
-public interface ReservationRestrictionRepository extends JpaRepository<ReservationRestriction, Long> {
-	List<ReservationRestriction> findByMemberIdOrderByStartsAtDesc(Long memberId);
+public interface ReservationRestrictionRepository
+		extends JpaRepository<ReservationRestriction, Long>, JpaSpecificationExecutor<ReservationRestriction> {
+	List<ReservationRestriction> findByMemberIdOrderByStartsAtDescIdDesc(Long memberId);
 
-	@Query("""
-			select r from ReservationRestriction r
-			where r.memberId = :memberId and r.startsAt <= :at and (r.endsAt is null or r.endsAt > :at)
-			order by r.startsAt""")
-	List<ReservationRestriction> findActive(Long memberId, LocalDateTime at);
+	Optional<ReservationRestriction> findByIdAndMemberId(Long id, Long memberId);
 }

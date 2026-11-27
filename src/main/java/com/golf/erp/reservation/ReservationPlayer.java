@@ -2,21 +2,21 @@ package com.golf.erp.reservation;
 
 import jakarta.persistence.*;
 
-/** golf.reservation_player. playerOrder 1 = 예약자 본인(isBookingMember=true), 2부터 동반자 */
+/** golf.reservation_player. playerOrder 1 = 예약자 본인(bookingMember=true), 2부터 동반자 */
 @Entity
 @Table(name = "reservation_player")
 public class ReservationPlayer {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "reservation_player_id")
-	private Long reservationPlayerId;
+	private Long id;
 	@Column(name = "reservation_id", nullable = false)
 	private Long reservationId;
 	@Column(name = "player_order", nullable = false)
 	private Short playerOrder;
 	@Column(name = "player_name", nullable = false, length = 100)
 	private String playerName;
-	@Column(length = 30)
+	@Column(name = "phone", length = 30)
 	private String phone;
 	@Column(name = "member_id")
 	private Long memberId;
@@ -36,8 +36,8 @@ public class ReservationPlayer {
 		this.bookingMember = bookingMember;
 	}
 
-	public Long getReservationPlayerId() {
-		return reservationPlayerId;
+	public Long getId() {
+		return id;
 	}
 
 	public Long getReservationId() {

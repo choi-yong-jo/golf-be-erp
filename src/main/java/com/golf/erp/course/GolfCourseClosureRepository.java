@@ -9,11 +9,13 @@ import java.util.List;
 public interface GolfCourseClosureRepository extends JpaRepository<GolfCourseClosure, Long> {
 	List<GolfCourseClosure> findByGolfCourseIdOrderByClosureStartDesc(Long golfCourseId);
 
+	List<GolfCourseClosure> findByGolfCourseIdAndActiveTrueOrderByClosureStartDesc(Long golfCourseId);
+
 	/** [from, to) 와 겹치는 활성 휴장 */
 	@Query("""
 			select c from GolfCourseClosure c
-			where c.golfCourseId = :courseId and c.active = true
+			where c.golfCourseId = :golfCourseId and c.active = true
 			  and c.closureStart < :to and c.closureEnd > :from
 			order by c.closureStart""")
-	List<GolfCourseClosure> findActiveOverlapping(Long courseId, LocalDateTime from, LocalDateTime to);
+	List<GolfCourseClosure> findActiveOverlapping(Long golfCourseId, LocalDateTime from, LocalDateTime to);
 }
